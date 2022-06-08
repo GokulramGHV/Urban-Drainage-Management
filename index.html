@@ -1,0 +1,194 @@
+<html>
+  <head>
+    <link href="./vis-network.css" rel="stylesheet" type="text/css" />
+    <script src="./vis-network.min.js" type="text/javascript"></script>
+    <script src="./jquery-3.6.0.min.js"></script>
+    <style type="text/css">
+      #mynetwork {
+        width: 100%;
+        height: 100vh;
+        background-color: #ffffff;
+        border: 1px solid lightgray;
+        position: relative;
+        float: left;
+      }
+    </style>
+    <link href="./output.css" rel="stylesheet" />
+    <title>City Drainage Management System</title>
+  </head>
+  <body>
+    <div id="mynetwork"></div>
+    <script src="index.js" type="text/javascript"></script>
+    <div
+      class="con-1 shadow-lg z-10 absolute top-5 right-5 bg-gray-100 border-2 border-gray-300 rounded-lg p-4 w-96"
+    >
+      <h1 class="text-xl font-bold text-gray-700">
+        City Drainage Management System
+      </h1>
+
+      <p class="mt-4 text-gray-600">
+        <span class="font-bold">House Selected (Source): </span>
+        <span id="selected-house"></span>
+      </p>
+      <p class="mt-1 text-gray-600">
+        <span class="font-bold">Nearest Waste Processing Plant (Dest.): </span>
+        <span id="dest-plant"></span>
+      </p>
+      <p class="mt-1 text-gray-600">
+        <span class="font-bold">Shortest Path Length: </span>
+        <span id="path-length"></span>
+      </p>
+      <p class="mt-1 text-gray-600">
+        <span class="font-bold">Shortest Path: </span> <span id="path"></span>
+      </p>
+      <p class="mt-4 text-gray-700">
+        The house nodes are denoted by
+        <span class="text-green-600 font-bold">Green</span> color and the waste
+        processing plant nodes are denoted by
+        <span class="text-red-900 font-bold">Brown</span> color. And the
+        shortest path edges are highlighted in
+        <span class="text-red-500 font-bold">Red</span> color.
+      </p>
+      <p class="mt-4 text-gray-800">
+        <span class="font-bold">Project By: </span> Gokulram A &amp; Guhan S
+      </p>
+      <button class="hover:underline mt-3 hide-me">Hide</button>
+    </div>
+
+    <div
+      class="show-me shadow-lg z-10 absolute top-5 right-5 bg-gray-100 border-2 border-gray-300 rounded-lg p-4"
+    >
+      <button class="hover:underline show-me">Show Details</button>
+    </div>
+
+    <!--Graph Options-->
+    <!--Add-->
+    <div
+      class="show-ge shadow-lg z-10 absolute bottom-5 left-5 bg-gray-100 border-2 border-gray-300 rounded-lg p-4"
+    >
+      <button class="hover:underline">Show Graph Editor</button>
+    </div>
+    <div
+      class="con-2 shadow-lg z-10 absolute bottom-5 left-5 bg-gray-100 border-2 border-gray-300 rounded-lg p-4 font-mono"
+      style="width: 40rem"
+    >
+      <div class="flow-root">
+        <div class="text-3xl text-gray-600 font-bold mb-5 float-left">
+          Graph Editor
+        </div>
+        <button
+          id="close-ge"
+          class="float-right mt-2 mr-2 hover:underline smooth-effect"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="bi bi-x-circle-fill w-5 h-5"
+            viewBox="0 0 16 16"
+            fill="#4b5563"
+          >
+            <path
+              d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM5.354 4.646a.5.5 0 1 0-.708.708L7.293 8l-2.647 2.646a.5.5 0 0 0 .708.708L8 8.707l2.646 2.647a.5.5 0 0 0 .708-.708L8.707 8l2.647-2.646a.5.5 0 0 0-.708-.708L8 7.293 5.354 4.646z"
+            />
+          </svg>
+        </button>
+      </div>
+
+      <!--Add-->
+      <h2 class="text-xl font-semibold text-gray-500 mb-3">Add Options</h2>
+      <div class="grid grid-cols-4 gap-4 h-12">
+        <input
+          type="text"
+          name="add-node"
+          id="add-node"
+          placeholder="Enter the name of the node to be added"
+          class="inp col-span-3"
+        />
+
+        <button
+          id="add-node-btn"
+          class="btn bg-emerald-600 hover:bg-emerald-700 hover:border-emerald-700"
+        >
+          Add Node
+        </button>
+      </div>
+      <div class="grid grid-cols-4 gap-3 mt-4">
+        <select
+          name="add-edge-from"
+          class="add-edge-sel inp-sel"
+          id="add-edge-from"
+        ></select>
+        <select
+          name="add-edge-to"
+          class="add-edge-sel inp-sel"
+          id="add-edge-to"
+        ></select>
+        <input
+          type="number"
+          name="add-edge-weight"
+          id="add-edge-weight"
+          class="inp"
+          placeholder="Edge Weight"
+        />
+        <button
+          id="add-edge-btn"
+          class="btn bg-indigo-500 hover:bg-indigo-600 hover:border-indigo-600"
+        >
+          Add Edge
+        </button>
+      </div>
+
+      <!--Remove-->
+      <h2 class="text-xl font-semibold text-gray-500 mb-3 mt-6">
+        Remove Options
+      </h2>
+      <div class="flex gap-3">
+        <select
+          name="rm-node"
+          class="add-edge-sel inp-sel flex-1"
+          id="rm-node"
+        ></select>
+        <button
+          id="rm-node-btn"
+          class="btn-custom px-4 bg-red-500 hover:bg-red-600 hover:border-red-600"
+        >
+          Remove Node
+        </button>
+      </div>
+      <div class="grid grid-cols-8 gap-3 mt-4">
+        <select
+          name="rm-edge-from"
+          class="add-edge-sel inp-sel px-10 col-span-3"
+          id="rm-edge-from"
+        ></select>
+        <select
+          name="rm-edge-to"
+          class="add-edge-sel inp-sel col-span-3"
+          id="rm-edge-to"
+        ></select>
+        <button
+          id="rm-edge-btn"
+          class="btn-custom bg-amber-600 hover:bg-amber-700 hover:border-amber-700 col-span-2 px-2"
+        >
+          Remove Edge
+        </button>
+      </div>
+      <!--Path options-->
+      <h2 class="text-xl font-semibold text-gray-500 mb-3 mt-6">
+        Path Options
+      </h2>
+      <div class="flex gap-3">
+        <select
+          name="shortest-path-from-sel"
+          id="shortest-path-from-sel"
+          class="inp-sel flex-1"
+        ></select>
+        <button
+          id="shortest-path-btn"
+          class="btn bg-blue-500 hover:bg-blue-600 hover:border-blue-600 col-span-2 px-2"
+        >
+          Find Nearest Sewage Plant
+        </button>
+      </div>
+    </div>
+  </body>
+</html>

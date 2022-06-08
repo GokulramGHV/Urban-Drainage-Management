@@ -1,0 +1,15 @@
+{
+  "name": "city-drainage-management-system",
+  "version": "1.0.0",
+  "description": "Graph based drainage management",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Gokulram A & Guhan S",
+  "license": "ISC",
+  "devDependencies": {
+    "@tailwindcss/forms": "^0.5.2",
+    "tailwindcss": "^3.0.24"
+  }
+}
