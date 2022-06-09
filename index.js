@@ -149,7 +149,7 @@ class Graph {
     this.adjacencyList = adj_list;
   }
   addNode(node) {
-    if (!this.adjacencyList[node]) {
+    if (!this.adjacencyList[node] && node != '') {
       this.adjacencyList[node] = {};
     }
   }
@@ -387,6 +387,18 @@ if (typeof String.prototype.trim === 'undefined') {
   };
 }
 
+function resetInputsFields() {
+  $('#add-node').val('');
+  $('#add-edge-from').val('');
+  $('#add-edge-to').val('');
+  $('.add-edge-sel').html('');
+  $('#shortest-path-from-sel').html('');
+  $('.add-edge-sel').append(`<option value="">---Select Node---</option>`);
+  $('#shortest-path-from-sel').append(
+    `<option value="">---Select Starting Node---</option>`
+  );
+}
+
 // file handling
 function init() {
   document
@@ -420,6 +432,27 @@ function handleFileLoad(event) {
   refreshInputs();
 }
 
+function saveGraphToFile() {
+  let graph_txt = '';
+  for (let node in graph.adjacencyList) {
+    graph_txt += node + '\n';
+  }
+  for (let node in graph.adjacencyList) {
+    for (let neighbor in graph.adjacencyList[node]) {
+      graph_txt +=
+        node +
+        ' ' +
+        neighbor +
+        ' ' +
+        graph.adjacencyList[node][neighbor] +
+        '\n';
+    }
+  }
+
+  var blob = new Blob([graph_txt], { type: 'text/plain;charset=utf-8' });
+  saveAs(blob, `graph_${Number(new Date())}.txt`);
+}
+
 // jQuery events
 $(document).ready(function () {
   $('.add-edge-sel').append(`<option value="">---Select Node---</option>`);
@@ -431,11 +464,17 @@ $(document).ready(function () {
   readFromLocalStorage();
   refreshInputs();
 
+  $('#save-btn').click(function () {
+    saveGraphToFile();
+  });
+
   $('#clear-btn').click(function () {
     localStorage.clear();
     graph.adjacencyList = {};
     refreshLocalStorage();
     refreshGraph();
+    resetInputsFields();
+    $('#fileInput').val('');
   });
 
   $('.show-ge').hide();
