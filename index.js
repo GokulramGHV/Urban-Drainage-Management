@@ -51,98 +51,6 @@ function drawGraph(node_list, edge_list) {
   return network;
 }
 
-// Min Heap Implementaition
-class MinHeap {
-  constructor() {
-    /* Initialing the array heap and adding a dummy element at index 0 */
-    this.heap = [null];
-  }
-
-  getMin() {
-    /* Accessing the min element at index 1 in the heap array */
-    return this.heap[1];
-  }
-
-  insert(node) {
-    /* Inserting the new node at the end of the heap array */
-    this.heap.push(node);
-
-    /* Finding the correct position for the new node */
-
-    if (this.heap.length > 1) {
-      let current = this.heap.length - 1;
-
-      /* Traversing up the parent node until the current node (current) is greater than the parent (current/2)*/
-      while (
-        current > 1 &&
-        this.heap[Math.floor(current / 2)] > this.heap[current]
-      ) {
-        /* Swapping the two nodes by using the ES6 destructuring syntax*/
-        [this.heap[Math.floor(current / 2)], this.heap[current]] = [
-          this.heap[current],
-          this.heap[Math.floor(current / 2)],
-        ];
-        current = Math.floor(current / 2);
-      }
-    }
-  }
-
-  remove() {
-    /* Smallest element is at the index 1 in the heap array */
-    let smallest = this.heap[1];
-
-    /* When there are more than two elements in the array, we put the right most element at the first position
-          and start comparing nodes with the child nodes
-      */
-    if (this.heap.length > 2) {
-      this.heap[1] = this.heap[this.heap.length - 1];
-      this.heap.splice(this.heap.length - 1);
-
-      if (this.heap.length === 3) {
-        if (this.heap[1] > this.heap[2]) {
-          [this.heap[1], this.heap[2]] = [this.heap[2], this.heap[1]];
-        }
-        return smallest;
-      }
-
-      let current = 1;
-      let leftChildIndex = current * 2;
-      let rightChildIndex = current * 2 + 1;
-
-      while (
-        this.heap[leftChildIndex] &&
-        this.heap[rightChildIndex] &&
-        (this.heap[current] > this.heap[leftChildIndex] ||
-          this.heap[current] > this.heap[rightChildIndex])
-      ) {
-        if (this.heap[leftChildIndex] < this.heap[rightChildIndex]) {
-          [this.heap[current], this.heap[leftChildIndex]] = [
-            this.heap[leftChildIndex],
-            this.heap[current],
-          ];
-          current = leftChildIndex;
-        } else {
-          [this.heap[current], this.heap[rightChildIndex]] = [
-            this.heap[rightChildIndex],
-            this.heap[current],
-          ];
-          current = rightChildIndex;
-        }
-
-        leftChildIndex = current * 2;
-        rightChildIndex = current * 2 + 1;
-      }
-    } else if (this.heap.length === 2) {
-      /* If there are only two elements in the array, we directly splice out the first element */
-      this.heap.splice(1, 1);
-    } else {
-      return null;
-    }
-
-    return smallest;
-  }
-}
-
 // Graph Implementation
 class Graph {
   constructor(adj_list = {}) {
@@ -161,7 +69,7 @@ class Graph {
 
   removeEdge(node1, node2) {
     delete this.adjacencyList[node1][node2];
-    delete this.adjacencyList[node2][node1];
+    // delete this.adjacencyList[node2][node1];
   }
 
   removeNode(node) {
@@ -181,42 +89,7 @@ class Graph {
   }
 }
 
-function dijsktra(graph, src, dest) {
-  let inf = Number.POSITIVE_INFINITY;
-  let node_data = {};
-  for (let node in graph.adjacencyList) {
-    node_data = { ...node_data, [node]: { cost: inf, pred: [] } };
-  }
-  node_data[src].cost = 0;
-  let visited = [];
-  let temp = src;
-  let min_heap = new MinHeap();
-  let cost;
-  for (let i = 0; i < Object.keys(node_data).length; i++) {
-    if (!visited.includes(temp)) {
-      visited.push(temp);
-      min_heap.heap = [];
-      for (let j in graph.adjacencyList[temp]) {
-        if (!visited.includes(j)) {
-          cost = node_data[temp].cost + graph.adjacencyList[temp][j];
-          if (cost < node_data[j].cost) {
-            node_data[j].cost = cost;
-            node_data[j].pred = [...node_data[temp].pred, temp];
-          }
-          min_heap.insert(j);
-        }
-      }
-    }
-    if (min_heap.heap.length === 0) {
-      break;
-    }
-    temp = min_heap.heap[0];
-  }
-  let cost_of_path = node_data[dest].cost;
-  let optimal_path = [...node_data[dest].pred, dest];
-  return { path: optimal_path, cost: cost_of_path };
-}
-
+// Bellman Ford Algorithm
 function BellmanFord(gph, src, dest) {
   let nodes = [];
   let edges = [];
@@ -260,6 +133,87 @@ function BellmanFord(gph, src, dest) {
   let cost_of_path = dis[dest].cost;
   let optimal_path = [...dis[dest].pred, dest];
   return { path: optimal_path, cost: cost_of_path };
+}
+
+const printTable = (table) => {
+  return Object.keys(table)
+    .map((vertex) => {
+      var { vertex: from, cost } = table[vertex];
+      return `${vertex}: ${cost} via ${from}`;
+    })
+    .join('\n');
+};
+
+const tracePath = (table, start, end) => {
+  var path = [];
+  var next = end;
+  while (true) {
+    path.unshift(next);
+    if (next === start) {
+      break;
+    }
+    next = table[next].vertex;
+  }
+
+  return path;
+};
+
+const formatGraph = (g) => {
+  const tmp = {};
+  Object.keys(g).forEach((k) => {
+    const obj = g[k];
+    const arr = [];
+    Object.keys(obj).forEach((v) => arr.push({ vertex: v, cost: obj[v] }));
+    tmp[k] = arr;
+  });
+  return tmp;
+};
+
+function dijkstra(graph, start, end) {
+  var map = formatGraph(graph);
+
+  var visited = [];
+  var unvisited = [start];
+  var shortestDistances = { [start]: { vertex: start, cost: 0 } };
+
+  var vertex;
+  while ((vertex = unvisited.shift())) {
+    // Explore unvisited neighbors
+    var neighbors = map[vertex].filter((n) => !visited.includes(n.vertex));
+
+    // Add neighbors to the unvisited list
+    unvisited.push(...neighbors.map((n) => n.vertex));
+
+    var costToVertex = shortestDistances[vertex].cost;
+
+    for (let { vertex: to, cost } of neighbors) {
+      var currCostToNeighbor =
+        shortestDistances[to] && shortestDistances[to].cost;
+      var newCostToNeighbor = costToVertex + cost;
+      if (
+        currCostToNeighbor == undefined ||
+        newCostToNeighbor < currCostToNeighbor
+      ) {
+        // Update the table
+        shortestDistances[to] = { vertex, cost: newCostToNeighbor };
+      }
+    }
+
+    visited.push(vertex);
+  }
+
+  console.log('Table of costs:');
+  console.log(printTable(shortestDistances));
+
+  const path = tracePath(shortestDistances, start, end);
+
+  return { path, cost: shortestDistances[end].cost };
+  // console.log(
+  //   'Shortest path is: ',
+  //   path.join(','),
+  //   ' with weight ',
+  //   shortestDistances[end].cost
+  // );
 }
 
 let graph = new Graph();
@@ -560,8 +514,19 @@ $(document).ready(function () {
       if (node.startsWith('p-')) {
         if ($('#shortest-path-from-sel').val() != '') {
           let from = $('#shortest-path-from-sel').val();
-          // let result = dijsktra(graph, from, node);
-          let result = BellmanFord(graph, from, node);
+          let result;
+          let startTime = performance.now();
+          if ($('#algo-sel').val() === 'dijkstra') {
+            result = dijkstra(graph.adjacencyList, from, node);
+          } else if ($('#algo-sel').val() === 'bellman-ford') {
+            result = BellmanFord(graph, from, node);
+          }
+          let endTime = performance.now();
+          // let result = BellmanFord(graph, from, node);
+          let run_time = endTime - startTime;
+          run_time = Math.round((run_time + Number.EPSILON) * 100) / 100;
+          console.log(`Algorithm took ${run_time} milliseconds`);
+          $('#run-time').text(String(run_time) + ' milliseconds');
           let path = result.path;
           let cost = result.cost;
           console.log(path, cost);
@@ -573,6 +538,7 @@ $(document).ready(function () {
       }
     }
     let from_house = $('#shortest-path-from-sel').val();
+
     $('#path').text(minPath.join(', '));
     $('#selected-house').text(from_house);
     $('#dest-plant').text(minPath[minPath.length - 1]);

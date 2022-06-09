@@ -45,6 +45,10 @@
         <span class="font-extrabold">Shortest Path: </span>
         <span id="path"></span>
       </p>
+      <p class="mt-1 text-gray-600">
+        <span class="font-extrabold">Running Time: </span>
+        <span id="run-time"></span>
+      </p>
       <p class="mt-4 text-gray-900">
         The house nodes are denoted by
         <span class="text-green-600 font-bold">Green</span> color and the waste
@@ -202,12 +206,16 @@
       <h2 class="text-xl font-semibold text-gray-500 mb-3 mt-6">
         Path Options
       </h2>
-      <div class="flex gap-3">
+      <div class="grid gap-3">
         <select
           name="shortest-path-from-sel"
           id="shortest-path-from-sel"
-          class="inp-sel flex-1"
+          class="inp-sel"
         ></select>
+        <select name="algo-sel" id="algo-sel" class="inp-sel flex-1">
+          <option value="dijkstra">Dijkstra</option>
+          <option value="bellman-ford">Bellman Ford</option>
+        </select>
         <button
           id="shortest-path-btn"
           class="btn bg-blue-500 hover:bg-blue-600 hover:border-blue-600 col-span-2 px-2"
