@@ -152,7 +152,12 @@ const tracePath = (table, start, end) => {
     if (next === start) {
       break;
     }
-    next = table[next].vertex;
+    // console.log(table[next]);
+    if (table[next]) {
+      next = table[next].vertex;
+    } else {
+      break;
+    }
   }
 
   return path;
@@ -204,10 +209,14 @@ function dijkstra(graph, start, end) {
 
   console.log('Table of costs:');
   console.log(printTable(shortestDistances));
-
+  // console.log(shortestDistances);
   const path = tracePath(shortestDistances, start, end);
-
-  return { path, cost: shortestDistances[end].cost };
+  if (shortestDistances[end]) {
+    return { path, cost: shortestDistances[end].cost };
+  } else {
+    return { path, cost: Infinity };
+  }
+  // return { path, cost: shortestDistances[end].cost };
   // console.log(
   //   'Shortest path is: ',
   //   path.join(','),
