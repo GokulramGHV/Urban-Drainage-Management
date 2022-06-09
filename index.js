@@ -145,8 +145,8 @@ class MinHeap {
 
 // Graph Implementation
 class Graph {
-  constructor() {
-    this.adjacencyList = {};
+  constructor(adj_list = {}) {
+    this.adjacencyList = adj_list;
   }
   addNode(node) {
     if (!this.adjacencyList[node]) {
@@ -154,6 +154,8 @@ class Graph {
     }
   }
   addEdge(node1, node2, weight) {
+    // console.log(node1, node2, weight);
+    // console.log(this.adjacencyList);
     this.adjacencyList[node1][node2] = weight;
   }
 
@@ -349,7 +351,93 @@ function refreshGraph() {
 
 refreshGraph();
 
+function readFromLocalStorage() {
+  let graph_data = localStorage.getItem('graph'); // parse JSON
+  if (graph_data) {
+    console.log(graph_data);
+    graph.adjacencyList = JSON.parse(graph_data);
+    refreshGraph();
+  }
+}
+
+function refreshLocalStorage() {
+  localStorage.setItem('graph', JSON.stringify(graph.adjacencyList));
+}
+
+function refreshInputs() {
+  for (let node in graph.adjacencyList) {
+    let find_1 = $('.add-edge-sel').find(`option[value="${node}"]`);
+    let find_2 = $('#shortest-path-from-sel').find(`option[value="${node}"]`);
+    if (find_1.length === 0) {
+      $('.add-edge-sel').append(`<option value="${node}">${node}</option>`);
+    }
+
+    if (find_2.length === 0 && node.startsWith('h-')) {
+      $('#shortest-path-from-sel').append(
+        `<option value="${node}">${node}</option>`
+      );
+    }
+    $('#add-node').val('');
+  }
+}
+
+if (typeof String.prototype.trim === 'undefined') {
+  String.prototype.trim = function () {
+    return String(this).replace(/^\s+|\s+$/g, '');
+  };
+}
+
+// file handling
+function init() {
+  document
+    .getElementById('fileInput')
+    .addEventListener('change', handleFileSelect, false);
+}
+
+function handleFileSelect(event) {
+  const reader = new FileReader();
+  reader.onload = handleFileLoad;
+  reader.readAsText(event.target.files[0]);
+}
+
+function handleFileLoad(event) {
+  console.log(event);
+  graph.adjacencyList = {};
+  let graph_data = event.target.result;
+  for (let line of graph_data.split('\n')) {
+    line = line.trim();
+    if (line.split(' ').length === 3) {
+      let [node1, node2, weight] = line.split(' ');
+      console.log(node1, node2, weight);
+
+      graph.addEdge(String(node1), String(node2), Number(weight));
+    } else {
+      graph.addNode(line);
+    }
+  }
+  refreshLocalStorage();
+  readFromLocalStorage();
+  refreshInputs();
+}
+
+// jQuery events
 $(document).ready(function () {
+  $('.add-edge-sel').append(`<option value="">---Select Node---</option>`);
+  $('#shortest-path-from-sel').append(
+    `<option value="">---Select Starting Node---</option>`
+  );
+
+  // Refresh graph from local storage
+  readFromLocalStorage();
+  refreshInputs();
+
+  $('#clear-btn').click(function () {
+    localStorage.clear();
+    graph.adjacencyList = {};
+    refreshLocalStorage();
+    refreshGraph();
+  });
+
   $('.show-ge').hide();
   $('#close-ge').click(function () {
     $('.con-2').hide();
@@ -375,6 +463,7 @@ $(document).ready(function () {
       let node = $('#add-node').val();
       graph.addNode(node);
       refreshGraph();
+      refreshLocalStorage();
       $('.add-edge-sel').append(`<option value="${node}">${node}</option>`);
       $('#add-node').val('');
       if (node.startsWith('h-')) {
@@ -382,10 +471,10 @@ $(document).ready(function () {
           `<option value="${node}">${node}</option>`
         );
       }
+      // readFromLocalStorage();
+      // refreshInputs();
     }
   });
-
-  $('.add-edge-sel').append(`<option value="">---Select Node---</option>`);
 
   $('#add-edge-btn').click(function () {
     if ($('#add-edge-from').val() != '' && $('#add-edge-to').val() != '') {
@@ -397,6 +486,7 @@ $(document).ready(function () {
       $('#add-edge-weight').val('');
       graph.addEdge(from, to, Number(weight));
       refreshGraph();
+      refreshLocalStorage();
     }
   });
 
@@ -405,7 +495,9 @@ $(document).ready(function () {
       let node = $('#rm-node').val();
       graph.removeNode(node);
       refreshGraph();
+      refreshLocalStorage();
       $('.add-edge-sel').find(`option[value="${node}"]`).remove();
+      $('#shortest-path-from-sel').find(`option[value="${node}"]`).remove();
       $('#rm-node').val('');
     }
   });
@@ -418,6 +510,7 @@ $(document).ready(function () {
       $('#rm-edge-to').val('');
       graph.removeEdge(from, to);
       refreshGraph();
+      refreshLocalStorage();
     }
   });
 
@@ -450,17 +543,6 @@ $(document).ready(function () {
 
     let obj = createGraphList(graph.adjacencyList, minPath);
     drawGraph(obj.node_list, obj.edge_list);
+    // refreshLocalStorage();
   });
-
-  $('#shortest-path-from-sel').append(
-    `<option value="">---Select Starting Node---</option>`
-  );
-
-  for (let node in graph.adjacencyList) {
-    if (node.startsWith('h-')) {
-      $('#shortest-path-from-sel').append(
-        `<option value="${node}">${node}</option>`
-      );
-    }
-  }
 });

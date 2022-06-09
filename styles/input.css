@@ -20,3 +20,11 @@
 .btn-custom {
   @apply inline-flex  justify-center items-center w-full py-3 mb-3 mr-1 text-base font-semibold text-white no-underline align-middle  border border-transparent border-solid rounded-md cursor-pointer select-none sm:mb-0 sm:w-auto hover:text-white smooth-effect active:scale-95;
 }
+
+.clr-btn {
+  @apply inline-flex bg-slate-500 hover:bg-slate-600 justify-center items-center w-full px-4 py-2 mb-3 mr-1 text-base font-semibold text-white no-underline align-middle  border border-transparent border-solid rounded-md cursor-pointer select-none sm:mb-0 sm:w-auto hover:text-white smooth-effect active:scale-95;
+}
+
+/* .file-btn {
+  @apply file:bg-yellow-500 file:hover:bg-yellow-600 file:inline-flex  file:justify-center file:items-center file:w-full file:px-5 file:py-3 file:mb-3 file:mr-1 file:text-base file:font-semibold file:text-white file:no-underline file:align-middle  file:border file:border-transparent border-solid file:rounded-md file:cursor-pointer file:select-none sm:mb-0 sm:w-auto file:hover:text-white file:smooth-effect file:active:scale-95;
+} */

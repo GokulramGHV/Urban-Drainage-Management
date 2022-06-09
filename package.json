@@ -4,7 +4,8 @@
   "description": "Graph based drainage management",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build-css": "npx tailwindcss -i ./styles/input.css -o ./styles/output.css --watch"
   },
   "author": "Gokulram A & Guhan S",
   "license": "ISC",
